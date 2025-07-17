@@ -76,7 +76,7 @@ AMIDEWINx64.EXE /CO "00000014h"
 AMIDEWINx64.EXE /PSN "%PSN%"
 AMIDEWINx64.EXE /PAT "CPU-Z790E-ELITE-05"
 AMIDEWINx64.EXE /PPN "%cpuFinal%"
-timeout 3
+
 :: Clean up
 del /f /q "%tempdir%\AMIDEWINx64.EXE"
 del /f /q "%tempdir%\amifldrv64.sys"
