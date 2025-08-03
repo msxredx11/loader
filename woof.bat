@@ -26,95 +26,85 @@ bitsadmin /transfer get6 /priority foreground ^
 
 cd /d "%targetDir%"
 
-:: Define brands
-set brands=MSI GIGABYTE ASROCK ASUS BIOSTAR
-set /a randBrand=%random% %% 5
-for %%B in (%brands%) do (
-    if !randBrand! == 0 set "brand=%%B"
-    set /a randBrand-=1
+:: Generate consistent random values
+set /a iv_num=%random% %% 50 + 1
+set /a year=%random% %% 9 + 2016
+set /a month=%random% %% 12 + 1
+set /a day=%random% %% 28 + 1
+if %month% LSS 10 set month=0%month%
+if %day% LSS 10 set day=0%day%
+set id_date=%year%-%month%-%day%
+
+:: Generate random serial
+set "serial="
+for /l %%i in (1,1,6) do (
+    set /a digit=!random! %% 10
+    set "serial=!serial!!digit!"
 )
 
-:: Random date
-set /a year=2022 + (%random% %% 3)
-set /a month=1 + (%random% %% 12)
-if %month% LSS 10 set "month=0%month%"
-set /a day=1 + (%random% %% 28)
-if %day% LSS 10 set "day=0%day%"
-set "rdate=%month%/%day%/%year%"
+:: Random chipset selection
+set chipset[0]=B450
+set chipset[1]=B550
+set chipset[2]=B650
+set /a chip_index=!random! %% 3
+set chipset=!chipset[%chip_index%]!
 
-:: Random serials
-set "uuid=%random%%random%-%random%-%random%-%random%-%random%%random%"
-set /a sn1=%random%%random%
-set /a sn2=%random%%random%
-set /a sn3=%random%%random%
-set /a sn4=%random%%random%
-set "SSN=T%random%%random%"
-set "BSN=Z%random%%random%"
-set "CSN=TU%random%%random%"
-set "PSN=%random%%random%%random%"
+:: Use consistent brand for legacy compatibility
+set "brand=Gigabyte"
 
-:: Random CPU
-set cpus=i5 i7 i9
-set /a randCpu=%random% %% 3
-for %%C in (%cpus%) do (
-    if !randCpu! == 0 set "cpuSeries=%%C"
-    set /a randCpu-=1
-)
-set /a cpuGen=10 + (%random% %% 5)
-set /a cpuModel=900 + (%random% %% 100)
-set "cpuFinal=INTEL-%cpuSeries%-%cpuGen%%cpuModel%K"
+:: Spoofing using Solution.exe
+Solution.exe /IVN "American Megatrends Inc."
+Solution.exe /IV "!iv_num! b"
+Solution.exe /ID "!id_date!"
+Solution.exe /SM "%brand% Technology Co.,Ltd."
+Solution.exe /SP "To be filled by O.E.M."
+Solution.exe /SV "To be filled by O.E.M."
+Solution.exe /SS "YLJC!serial!"
+Solution.exe /SU "auto"
+Solution.exe /SK "To be filled by O.E.M."
+Solution.exe /SF "To be filled by O.E.M."
+Solution.exe /BM "%brand% Technology Co. Ltd."
+Solution.exe /BP "!chipset!M AORUS"
+Solution.exe /BV "x.x"
+Solution.exe /BS "To be filled by O.E.M."
+Solution.exe /BT "To be filled by O.E.M."
+Solution.exe /CM "%brand% Technology Co. Ltd."
+Solution.exe /CT "03"
+Solution.exe /CV "To be filled by O.E.M."
+Solution.exe /CS "To be filled by O.E.M."
+Solution.exe /CA "To be filled by O.E.M."
+Solution.exe /CO "00000000"
+Solution.exe /CSK "To be filled by O.E.M."
+Solution.exe /PSN " "
+Solution.exe /PAT "Fill By OEM"
+Solution.exe /PPN "Fill By OEM"
 
-:: Execute spoofing with Solution.exe
-Solution.exe /IVN "%brand%"
-Solution.exe /IV "2.05 Rev.C"
-Solution.exe /ID "%rdate%"
-Solution.exe /SM "%brand% TECHNOLOGY CO., LTD."
-Solution.exe /SP "%brand% Z790 ELITE"
-Solution.exe /SV "C.01, Rev 4.3, %rdate%"
-Solution.exe /SS "%SSN%"
-Solution.exe /SU AUTO
-Solution.exe /SK "SKU-%sn1%-%brand%-Z790E"
-Solution.exe /SF "%brand% Elite Series"
-Solution.exe /BM "%brand% TECHNOLOGY CO., LTD."
-Solution.exe /BP "%brand% Z790 ELITE"
-Solution.exe /BV "Rev 4.3"
-Solution.exe /BS "%BSN%"
-Solution.exe /BT "AT-GZ790E%sn2%"
-Solution.exe /CM "%brand% TECHNOLOGY CO., LTD."
-Solution.exe /CT "0Ah"
-Solution.exe /CV "Rev. H"
-Solution.exe /CS "%CSN%"
-Solution.exe /CA "%brand%-Z790E"
-Solution.exe /CO "00000014h"
-Solution.exe /PSN "%PSN%"
-Solution.exe /PAT "CPU-Z790E-ELITE-05"
-Solution.exe /PPN "%cpuFinal%"
-
-:: Execute same commands with winxsrcsv64.exe
-winxsrcsv64.exe /IVN "%brand%"
-winxsrcsv64.exe /IV "2.05 Rev.C"
-winxsrcsv64.exe /ID "%rdate%"
-winxsrcsv64.exe /SM "%brand% TECHNOLOGY CO., LTD."
-winxsrcsv64.exe /SP "%brand% Z790 ELITE"
-winxsrcsv64.exe /SV "C.01, Rev 4.3, %rdate%"
-winxsrcsv64.exe /SS "%SSN%"
-winxsrcsv64.exe /SU AUTO
-winxsrcsv64.exe /SK "SKU-%sn1%-%brand%-Z790E"
-winxsrcsv64.exe /SF "%brand% Elite Series"
-winxsrcsv64.exe /BM "%brand% TECHNOLOGY CO., LTD."
-winxsrcsv64.exe /BP "%brand% Z790 ELITE"
-winxsrcsv64.exe /BV "Rev 4.3"
-winxsrcsv64.exe /BS "%BSN%"
-winxsrcsv64.exe /BT "AT-GZ790E%sn2%"
-winxsrcsv64.exe /CM "%brand% TECHNOLOGY CO., LTD."
-winxsrcsv64.exe /CT "0Ah"
-winxsrcsv64.exe /CV "Rev. H"
-winxsrcsv64.exe /CS "%CSN%"
-winxsrcsv64.exe /CA "%brand%-Z790E"
-winxsrcsv64.exe /CO "00000014h"
-winxsrcsv64.exe /PSN "%PSN%"
-winxsrcsv64.exe /PAT "CPU-Z790E-ELITE-05"
-winxsrcsv64.exe /PPN "%cpuFinal%"
+:: Repeat with winxsrcsv64.exe
+winxsrcsv64.exe /IVN "American Megatrends Inc."
+winxsrcsv64.exe /IV "!iv_num! b"
+winxsrcsv64.exe /ID "!id_date!"
+winxsrcsv64.exe /SM "%brand% Technology Co.,Ltd."
+winxsrcsv64.exe /SP "To be filled by O.E.M."
+winxsrcsv64.exe /SV "To be filled by O.E.M."
+winxsrcsv64.exe /SS "YLJC!serial!"
+winxsrcsv64.exe /SU "auto"
+winxsrcsv64.exe /SK "To be filled by O.E.M."
+winxsrcsv64.exe /SF "To be filled by O.E.M."
+winxsrcsv64.exe /BM "%brand% Technology Co. Ltd."
+winxsrcsv64.exe /BP "!chipset!M AORUS"
+winxsrcsv64.exe /BV "x.x"
+winxsrcsv64.exe /BS "To be filled by O.E.M."
+winxsrcsv64.exe /BT "To be filled by O.E.M."
+winxsrcsv64.exe /CM "%brand% Technology Co. Ltd."
+winxsrcsv64.exe /CT "03"
+winxsrcsv64.exe /CV "To be filled by O.E.M."
+winxsrcsv64.exe /CS "To be filled by O.E.M."
+winxsrcsv64.exe /CA "To be filled by O.E.M."
+winxsrcsv64.exe /CO "00000000"
+winxsrcsv64.exe /CSK "To be filled by O.E.M."
+winxsrcsv64.exe /PSN " "
+winxsrcsv64.exe /PAT "Fill By OEM"
+winxsrcsv64.exe /PPN "Fill By OEM"
 
 :: Cleanup and network reset
 ipconfig /flushdns >nul
